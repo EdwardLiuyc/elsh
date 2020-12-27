@@ -20,3 +20,61 @@ and you have already install the `elsh` in the system, then you can use:
 elsh example.sh
 ```
 to run this script.
+
+## Definitions
+### Basic Data Types
+| Name      |              Common name               | Character sequence |
+| :-------- | :------------------------------------: | :----------------: |
+| Dt_int32  |             32bit integer              |       int32        |
+| Dt_int64  |             64bit integer              |       int64        |
+| Dt_uint32 |         32bit unsigned integer         |       uint32       |
+| Dt_uint64 |         64bit unsigned integer         |       uint64       |
+| Dt_double | double-precision floating-point number |       double       |
+| Dt_char   |                charater                |        char        |
+| Dt_string |                 string                 |       string       |
+
+### Operators
+| Name            |      Common name      | Character sequence |
+| :-------------- | :-------------------: | :----------------: |
+| Op_multiply     |       multiply        |         *          |
+| Op_divide       |        divide         |         /          |
+| Op_mod          |          mod          |         %          |
+| Op_add          |         plus          |         +          |
+| Op_subtract     |         minus         |         -          |
+| Op_negate       |      unary minus      |         -          |
+| Op_less         |       less than       |         <          |
+| Op_lessequal    |  less than or equal   |         <=         |
+| Op_greater      |     greater than      |         >          |
+| Op_greaterequal | greater than or equal |         >=         |
+| Op_equal        |         equal         |         ==         |
+| Op_notequal     |       not equal       |         !=         |
+| Op_not          |       unary not       |         !          |
+| Op_assign       |      assignment       |         =          |
+| Op_and          |      logical and      |         &&         |
+| Op_or           |      logical or       |         ¦¦         |
+
+### Symbols
+| Name         |    Common name    | Character sequence |
+| :----------- | :---------------: | :----------------: |
+| LeftParen    | left parenthesis  |         (          |
+| RightParen   | right parenthesis |         )          |
+| LeftBrace    |    left brace     |         {          |
+| RightBrace   |    right brace    |         }          |
+| LeftBracket  |   left bracket    |         [          |
+| RightBracket |   right bracket   |         ]          |
+| Semicolon    |    semi-colon     |         ;          |
+| Comma        |       comma       |         ,          |
+
+### Keywords
+| Name          | Character sequence |
+| :------------ | :----------------: |
+| Keyword_if    |         if         |
+| Keyword_else  |        else        |
+| Keyword_while |       while        |
+| Keyword_do    |         do         |
+| Keyword_print |       print        |
+| Keyword_putc  |        putc        |
+
+
+## Build
+make

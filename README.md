@@ -32,6 +32,8 @@ to run this script.
 | Dt_double | double-precision floating-point number |       double       |
 | Dt_char   |                charater                |        char        |
 | Dt_string |                 string                 |       string       |
+| Dt_void   |               empty type               |        void        |
+| Dt_bool   |                boolean                 |        bool        |
 
 ### Operators
 | Name            |      Common name      | Character sequence |
@@ -65,15 +67,28 @@ to run this script.
 | Semicolon    |    semi-colon     |         ;          |
 | Comma        |       comma       |         ,          |
 
-### Keywords
-| Name          | Character sequence |
-| :------------ | :----------------: |
-| Keyword_if    |         if         |
-| Keyword_else  |        else        |
-| Keyword_while |       while        |
-| Keyword_do    |         do         |
-| Keyword_print |       print        |
-| Keyword_putc  |        putc        |
+### Reverved Keywords
+| Name             | Character sequence |
+| :--------------- | :----------------: |
+| Keyword_if       |         if         |
+| Keyword_else     |        else        |
+| Keyword_while    |       while        |
+| Keyword_break    |       break        |
+| Keyword_continue |      continue      |
+| Keyword_do       |         do         |
+| Keyword_for      |        for         |
+| Keyword_print    |       print        |
+| Keyword_putc     |        putc        |
+| Keyword_return   |       return       |
+| Keyword_true     |        true        |
+| Keyword_false    |       false        |
+| Keyword_const    |       const        |
+
+### Comments
+| Name                | Character sequence |
+| :------------------ | :----------------: |
+| SingleLine Comments |        `//`        |
+| MultiLine Comments  |    `/* ... */`     |
 
 
 ## Build

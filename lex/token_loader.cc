@@ -7,13 +7,12 @@
 
 namespace lex {
 namespace {
-
 const std::unordered_map<char, TokenType> kSimpleTokenMap{
-    {'{', TokenType::tk_Lbrace}, {'}', TokenType::tk_Rbrace},
-    {'(', TokenType::tk_Lparen}, {')', TokenType::tk_Rparen},
-    {'+', TokenType::tk_Add},    {'-', TokenType::tk_Sub},
-    {'*', TokenType::tk_Mul},    {'%', TokenType::tk_Mod},
-    {';', TokenType::tk_Semi},   {',', TokenType::tk_Comma}};
+    {'{', TokenType::kTokenSymLbrace},    {'}', TokenType::kTokenSymRbrace},
+    {'(', TokenType::kTokenSymLparen},    {')', TokenType::kTokenSymRparen},
+    {'+', TokenType::kTokenOpAdd},        {'-', TokenType::kTokenOpSub},
+    {'*', TokenType::kTokenOpMul},        {'%', TokenType::kTokenOpMod},
+    {';', TokenType::kTokenSymSemiColon}, {',', TokenType::kTokenSymComma}};
 }
 
 Token TokenLoader::GetToken() {
@@ -36,32 +35,32 @@ Token TokenLoader::GetToken() {
         return CharSplit(start_line, start_col);
       case '<':
         GetNextChar();
-        return Follow('=', TokenType::tk_Leq, TokenType::tk_Lss, start_line,
-                      start_col);
+        return Follow('=', TokenType::kTokenOpLeq, TokenType::kTokenOpLss,
+                      start_line, start_col);
       case '>':
         GetNextChar();
-        return Follow('=', TokenType::tk_Geq, TokenType::tk_Gtr, start_line,
-                      start_col);
+        return Follow('=', TokenType::kTokenOpGeq, TokenType::kTokenOpGtr,
+                      start_line, start_col);
       case '=':
         GetNextChar();
-        return Follow('=', TokenType::tk_Eq, TokenType::tk_Assign, start_line,
-                      start_col);
+        return Follow('=', TokenType::kTokenOpEq, TokenType::kTokenOpAssign,
+                      start_line, start_col);
       case '!':
         GetNextChar();
-        return Follow('=', TokenType::tk_Neq, TokenType::tk_Not, start_line,
-                      start_col);
+        return Follow('=', TokenType::kTokenOpNeq, TokenType::kTokenOpNot,
+                      start_line, start_col);
       case '&':
         GetNextChar();
-        return Follow('&', TokenType::tk_And, TokenType::tk_EOI, start_line,
-                      start_col);
+        return Follow('&', TokenType::kTokenOpAnd, TokenType::kTokenEOI,
+                      start_line, start_col);
       case '|':
         GetNextChar();
-        return Follow('|', TokenType::tk_Or, TokenType::tk_EOI, start_line,
-                      start_col);
+        return Follow('|', TokenType::kTokenOpOr, TokenType::kTokenEOI,
+                      start_line, start_col);
       case '"':
         return StringSplit(start_line, start_col);
       case EOF:
-        return Token{TokenType::tk_EOI, start_line, start_col, {0}};
+        return Token{TokenType::kTokenEOI, start_line, start_col, {0}};
       default:
         return IndentifierOrInteger(start_line, start_col);
     }
@@ -83,7 +82,7 @@ void TokenLoader::GetNextChar() {
 
 Token TokenLoader::DivisionOrComment(const int line, const int col) {
   if (current_char_ != '*') {
-    return Token{TokenType::tk_Div, line, col, {0}};
+    return Token{TokenType::kTokenOpDiv, line, col, {0}};
   }
 
   /* comment found */
@@ -109,7 +108,7 @@ Token TokenLoader::CharSplit(const int line, const int col) {
     Error("empty character constant");
   }
 
-  int n = current_char_;
+  char n = current_char_;
   if (current_char_ == '\\') {
     GetNextChar();
     if (current_char_ == 'n') {
@@ -126,7 +125,7 @@ Token TokenLoader::CharSplit(const int line, const int col) {
     Error("multi-character constant");
   }
   GetNextChar();
-  return Token{TokenType::tk_Integer, line, col, {n}};
+  return Token{TokenType::kTokenValudChar, line, col, {n}};
 }
 
 Token TokenLoader::StringSplit(const int line, const int col) {
@@ -143,7 +142,7 @@ Token TokenLoader::StringSplit(const int line, const int col) {
   }
 
   GetNextChar();
-  return Token(TokenType::tk_String, line, col, str);
+  return Token(TokenType::kTokenValueString, line, col, str);
 }
 
 Token TokenLoader::IndentifierOrInteger(const int line, const int col) {
@@ -170,19 +169,14 @@ Token TokenLoader::IndentifierOrInteger(const int line, const int col) {
     }
     n = std::stoi(str);
     if (errno == ERANGE) Error("Number exceeds maximum value");
-    return Token{TokenType::tk_Integer, line, col, {n}};
+    return Token{TokenType::kTokenValueInt, line, col, {n}};
   }
   return Token(GetIdentifierType(str), line, col, str);
 }
 
 TokenType TokenLoader::GetIdentifierType(const std::string& text) {
-  const std::unordered_map<std::string, TokenType> inner_identifiers{
-      {"else", TokenType::tk_Else},   {"if", TokenType::tk_If},
-      {"print", TokenType::tk_Print}, {"putc", TokenType::tk_Putc},
-      {"while", TokenType::tk_While}, {"do", TokenType::tk_Do}};
-
-  return inner_identifiers.count(text) > 0 ? inner_identifiers.at(text)
-                                           : TokenType::tk_Ident;
+  return kReservedKeywords.count(text) > 0 ? kReservedKeywords.at(text)
+                                           : TokenType::kTokenIdentifier;
 }
 
 Token TokenLoader::Follow(const char expect, const TokenType is_yes_token,
@@ -191,7 +185,7 @@ Token TokenLoader::Follow(const char expect, const TokenType is_yes_token,
   if (current_char_ == expect) {
     GetNextChar();
     return Token{is_yes_token, line, col, {0}};
-  } else if (is_no_token == TokenType::tk_EOI) {
+  } else if (is_no_token == TokenType::kTokenEOI) {
     Error("Follow: unrecognized character " + current_char_);
   }
   return Token{is_no_token, line, col, {0}};

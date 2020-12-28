@@ -8,8 +8,8 @@
 
 #include "lex/token_loader.h"
 
+using lex::kTokenNames;
 using lex::Token;
-using lex::TokenNames;
 using lex::TokenType;
 
 int main(int argc, char** argv) {
@@ -22,16 +22,17 @@ int main(int argc, char** argv) {
   do {
     tok = loader.GetToken();
     std::cout << "\t" << tok.err_ln << "\t" << tok.err_col << "\t"
-              << TokenNames.at(tok.tok_type);
+              << kTokenNames.at(tok.tok_type);
 
     switch (tok.tok_type) {
-      case TokenType::tk_Integer:
+      case TokenType::kTokenValueInt:
         std::cout << "\t" << tok.n;
         break;
-      case TokenType::tk_Ident:
-        std::cout << "\t" << tok.str;
+      case TokenType::kTokenValudChar:
+        std::cout << "\t" << static_cast<int>(tok.text);
         break;
-      case TokenType::tk_String:
+      case TokenType::kTokenIdentifier:
+      case TokenType::kTokenValueString:
         std::cout << "\t" << tok.str;
         break;
 
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
         break;
     }
     std::cout << "\n" << std::flush;
-  } while (tok.tok_type != TokenType::tk_EOI);
+  } while (tok.tok_type != TokenType::kTokenEOI);
 
   return 0;
 }

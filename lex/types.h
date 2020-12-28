@@ -10,43 +10,82 @@
 
 namespace lex {
 
-enum class TokenType : uint8_t {
-  tk_EOI,
-  tk_Mul,
-  tk_Div,
-  tk_Mod,
-  tk_Add,
-  tk_Sub,
-  tk_Negate,
-  tk_Not,
-  tk_Lss,
-  tk_Leq,
-  tk_Gtr,
-  tk_Geq,
-  tk_Eq,
-  tk_Neq,
-  tk_Assign,
-  tk_And,
-  tk_Or,
-  tk_If,
-  tk_Else,
-  tk_While,
-  tk_Do,
-  tk_Print,
-  tk_Putc,
-  tk_Lparen,
-  tk_Rparen,
-  tk_Lbrace,
-  tk_Rbrace,
-  tk_Semi,
-  tk_Comma,
-  tk_Ident,
-  tk_Integer,
-  tk_Double,
-  tk_String
+enum class TokenType : uint16_t {
+  kTokenEOI = 0,
+
+  // Operators
+  kTokenOpMul = 100,
+  kTokenOpDiv = 101,
+  kTokenOpMod = 102,
+  kTokenOpAdd = 103,
+  kTokenOpSub = 104,
+  kTokenOpNegate = 105,
+  kTokenOpNot = 106,
+  kTokenOpLss = 107,
+  kTokenOpLeq = 108,
+  kTokenOpGtr = 109,
+  kTokenOpGeq = 110,
+  kTokenOpEq = 111,
+  kTokenOpNeq = 112,
+  kTokenOpAssign = 113,
+  kTokenOpAnd = 114,
+  kTokenOpOr = 115,
+
+  // Reserved Keywords
+  kTokenKwIf = 200,
+  kTokenKwElse = 201,
+  kTokenKwWhile = 202,
+  kTokenKwBreak = 203,
+  kTokenKwContinue = 204,
+  kTokenKwDo = 205,
+  kTokenKwFor = 206,
+  kTokenKwPrint = 207,
+  kTokenKwPutc = 208,
+  kTokenKwReturn = 209,
+  kTokenKwConst = 210,
+
+  // Symbols
+  kTokenSymLparen = 300,
+  kTokenSymRparen = 301,
+  kTokenSymLbrace = 302,
+  kTokenSymRbrace = 303,
+  kTokenSymLbracket = 304,
+  kTokenSymRbracket = 305,
+  kTokenSymSemiColon = 306,
+  kTokenSymComma = 307,
+
+  // Data types
+  kTokenDtInt32 = 400,
+  kTokenDtInt64 = 401,
+  kTokenDtUint32 = 402,
+  kTokenDtUint64 = 403,
+  kTokenDtDouble = 404,
+  kTokenDtChar = 405,
+  kTokenDtVoid = 407,
+  kTokenDtBool = 408,
+  kTokenDtString = 409,
+
+  // Others
+  kTokenIdentifier = 500,
+  kTokenValueInt = 501,
+  kTokenValueDouble = 502,
+  kTokenValudChar = 503,
+  kTokenValueString = 504,
+  kTokenValueBool = 505,
 };
 
-extern const std::map<TokenType, std::string> TokenNames;
+// Enum class can not be use as `unordered_map` key in c++11, so we define our
+// own hash function for enum classes.
+struct EnumClassHash {
+  template <typename T>
+  std::size_t operator()(const T& t) const {
+    return static_cast<std::size_t>(t);
+  }
+};
+
+extern const std::unordered_map<TokenType, std::string, EnumClassHash>
+    kTokenNames;
+extern const std::unordered_map<std::string, TokenType> kReservedKeywords;
 
 struct Token {
   Token() = default;

@@ -1,4 +1,24 @@
-// Copyright
+// MIT License
+
+// Copyright (c) 2020 Edward Liu
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 #ifndef LEX_TYPES_H_
 #define LEX_TYPES_H_
@@ -94,19 +114,21 @@ struct Token {
   Token(TokenType type, const int line, const int col, const std::string& s)
       : tok_type(type), err_ln(line), err_col(col), str(s) {}
   Token(TokenType type, const int line, const int col, const int int_value)
-      : tok_type(type), err_ln(line), err_col(col), n(int_value) {}
+      : tok_type(type), err_ln(line), err_col(col), value_int(int_value) {}
   Token(TokenType type, const int line, const int col, const char char_value)
-      : tok_type(type), err_ln(line), err_col(col), text(char_value) {}
+      : tok_type(type), err_ln(line), err_col(col), value_char(char_value) {}
 
   TokenType tok_type;
 
   int err_ln;
   int err_col;
   std::string str = "";
-  // Vaules
+  // value for constants
   union {
-    int n; /* value for constants */
-    char text;
+    int64_t value_int;
+    double value_double;
+    char value_char;
+    bool value_bool;
   };
 };
 

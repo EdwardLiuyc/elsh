@@ -20,47 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <libio.h>
-#include <stdarg.h>
-#include <fstream>
-#include <iostream>
+#ifndef TEST_SIMPLE_UNIT_TEST_H_
+#define TEST_SIMPLE_UNIT_TEST_H_
+
+#include <string>
 #include <unordered_map>
 
-#include "lex/token_loader.h"
+/// @brief A simple unit test framework which rely on only c++11 stl.
+/// Should be used like this:
+///
+///  #include "simple_unit_test.h"
+///  #include <fstream>
+///  SIMPLE_TEST_PACKAGE(LEX)
+///
+///  namespace std {
+///  SIMPLE_TEST_CASE(TEST_1) {
+///    fstream fs("test.txt");
+///    EXPECT_TRUE(fs.is_open());
+///  }
+///  }
 
-using lex::kTokenNames;
-using lex::Token;
-using lex::TokenType;
-
-int main(int argc, char** argv) {
-  if (argc < 2) {
-    return -1;
-  }
-
-  lex::TokenLoader loader(argv[1]);
-  Token tok;
-  do {
-    tok = loader.GetToken();
-    std::cout << "\t" << tok.err_ln << "\t" << tok.err_col << "\t"
-              << kTokenNames.at(tok.tok_type);
-
-    switch (tok.tok_type) {
-      case TokenType::kTokenValueInt:
-        std::cout << "\t" << tok.value_int;
-        break;
-      case TokenType::kTokenValudChar:
-        std::cout << "\t" << static_cast<int>(tok.value_char);
-        break;
-      case TokenType::kTokenIdentifier:
-      case TokenType::kTokenValueString:
-        std::cout << "\t" << tok.str;
-        break;
-
-      default:
-        break;
-    }
-    std::cout << "\n" << std::flush;
-  } while (tok.tok_type != TokenType::kTokenEOI);
-
-  return 0;
-}
+#endif  // TEST_SIMPLE_UNIT_TEST_H_

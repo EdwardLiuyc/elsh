@@ -20,30 +20,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "simple_unit_test.h"
+#include "test/utest_framework/simple_unit_test.h"
 
 #include <iostream>
 
 namespace elsh {
-namespace simple_unit_test {
+namespace test {
+namespace utest_framework {
 
-std::shared_ptr<TestFactory> TestFactory::instance_ = nullptr;
+TestFactory* TestFactory::Instance() {
+  static TestFactory instance;
+  return &instance;
+}
 
-void TestFactory::Append(TestBase* test_case) { tests_.push_back(test_case); }
+void TestFactory::Append(std::shared_ptr<TestBase> test_case) {
+  tests_.push_back(test_case);
+}
 
 void TestFactory::Run() {
-  std::cout << tests_.size() << std::endl;
   for (auto test_case : tests_) {
     test_case->TestFunc();
   }
 }
 
-}  // namespace simple_unit_test
+void TestFactory::Dump() {
+  for (const auto& test_case : tests_) {
+    for (const auto& test_info : test_case->test_infos_) {
+      if (test_info.as_expected) {
+        continue;
+      }
+      std::cout << test_info.file << ": " << test_case->name_ << " : "
+                << test_info.line_num << ": " << test_info.condition
+                << " check failed.\n"
+                << std::flush;
+    }
+  }
+}
+
+}  // namespace utest_framework
+}  // namespace test
 }  // namespace elsh
 
-SIMPLE_TEST(lex, test_1) { std::cout << "lex_test_1" << std::endl; }
-
 int main(int, char**) {
-  elsh::simple_unit_test::TestFactory::Instance()->Run();
+  elsh::test::utest_framework::TestFactory::Instance()->Run();
+  elsh::test::utest_framework::TestFactory::Instance()->Dump();
   return 0;
 }

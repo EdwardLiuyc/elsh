@@ -20,24 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <libio.h>
-#include <stdarg.h>
 #include <fstream>
 #include <iostream>
 #include <unordered_map>
 
 #include "lex/token_loader.h"
 
-using lex::kTokenNames;
-using lex::Token;
-using lex::TokenType;
+using elsh::lex::kTokenNames;
+using elsh::lex::Token;
+using elsh::lex::TokenType;
 
 int main(int argc, char** argv) {
   if (argc < 2) {
     return -1;
   }
 
-  lex::TokenLoader loader(argv[1]);
+  elsh::lex::TokenLoader loader(argv[1]);
   Token tok;
   do {
     tok = loader.GetToken();

@@ -23,7 +23,9 @@
 #include "lex/types.h"
 
 #include <map>
+#include <unordered_map>
 
+namespace elsh {
 namespace lex {
 
 const std::unordered_map<TokenType, std::string, EnumClassHash> kTokenNames{
@@ -109,3 +111,4 @@ const std::unordered_map<std::string, TokenType> kReservedKeywords{
     {"string", TokenType::kTokenDtString}};
 
 }  // namespace lex
+}  // namespace elsh

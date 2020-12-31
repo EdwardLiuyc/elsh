@@ -28,6 +28,7 @@
 #include <string>
 #include <unordered_map>
 
+namespace elsh {
 namespace lex {
 
 enum class TokenType : uint16_t {
@@ -133,5 +134,6 @@ struct Token {
 };
 
 }  // namespace lex
+}  // namespace elsh
 
 #endif  // LEX_TYPES_H_

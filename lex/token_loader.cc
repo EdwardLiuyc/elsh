@@ -25,6 +25,7 @@
 #include <iostream>
 #include <unordered_map>
 
+namespace elsh {
 namespace lex {
 namespace {
 const std::unordered_map<char, TokenType> kSimpleTokenMap{
@@ -218,3 +219,4 @@ void TokenLoader::Error(const std::string& error_msg) {
 }
 
 }  // namespace lex
+}  // namespace elsh

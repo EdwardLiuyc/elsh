@@ -20,47 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef LEX_TOKEN_LOADER_H_
-#define LEX_TOKEN_LOADER_H_
+#include <iostream>
 
-#include <fstream>
-#include <string>
+#include "lex/token_loader.h"
+#include "test/utest_framework/simple_unit_test.h"
 
-#include "lex/types.h"
+SIMPLE_TEST(Lex, test1) {
+  EXPECT_EQ(2, 1);
+  EXPECT_GT(2, 1);
+  EXPECT_EQ(2, 2);
+}
 
-namespace elsh {
-namespace lex {
-
-class TokenLoader {
- public:
-  explicit TokenLoader(const std::string& source_filename)
-      : source_fs_(source_filename) {}
-
-  Token GetToken();
-
- private:
-  void GetNextChar();
-
-  Token DivisionOrComment(const int line, const int col);
-  Token CharSplit(const int line, const int col);
-  Token StringSplit(const int line, const int col);
-  Token IndentifierOrInteger(const int line, const int col);
-  TokenType GetIdentifierType(const std::string& text);
-  Token Follow(const char next, const TokenType is_yes_token,
-               const TokenType is_no_token, const int line, const int col);
-
-  void Error(const std::string& error_msg);
-
- private:
-  std::ifstream source_fs_;
-  char current_char_ = ' ';
-  char last_char_;
-
-  int current_line_ = 1;
-  int current_col_ = 0;
-};
-
-}  // namespace lex
-}  // namespace elsh
-
-#endif  // LEX_TOKEN_LOADER_H_
+SIMPLE_TEST(Lex, test2) {
+  EXPECT_EQ(1, 1);
+  EXPECT_GE(2, 1);
+  EXPECT_NE(2, 3);
+}

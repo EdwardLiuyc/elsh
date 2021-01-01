@@ -23,6 +23,7 @@
 #ifndef LEX_TYPES_H_
 #define LEX_TYPES_H_
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -32,8 +33,8 @@ namespace elsh {
 namespace lex {
 
 enum class TokenType : uint16_t {
-  kTokenEOI = 0,
-  kTokenUnknown = 1,
+  kTokenUnknown = 0,
+  kTokenEOI = 1,
 
   // Operators
   kTokenOpMul = 100,
@@ -126,10 +127,10 @@ struct Token {
         err_col(col),
         value_double(double_value) {}
 
-  TokenType tok_type;
+  TokenType tok_type = TokenType::kTokenUnknown;
 
-  int err_ln;
-  int err_col;
+  int err_ln = -1;
+  int err_col = -1;
   std::string str = "";
   // value for constants
   union {
@@ -138,7 +139,11 @@ struct Token {
     char value_char;
     bool value_bool;
   };
+
+  friend std::ostream& operator<<(std::ostream& os, const Token& t);
 };
+
+std::ostream& operator<<(std::ostream& os, const Token& t);
 
 }  // namespace lex
 }  // namespace elsh

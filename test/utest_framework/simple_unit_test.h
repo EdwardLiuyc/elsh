@@ -150,11 +150,11 @@ constexpr bool StaticAssertTypeEq() noexcept {
                ::elsh::test::utest_framework::TestBase, \
                ::elsh::test::utest_framework::TestFactory)
 
-#define EXPECT_OP(val1, val2, operator)                       \
-  {                                                           \
-    if (!((val1) operator(val2)))                             \
-      Insert(__FILE__, std::string(#val1) + #operator+ #val2, \
-             __LINE__,((val1) operator(val2)));               \
+#define EXPECT_OP(val1, val2, operator)                                 \
+  {                                                                     \
+    if (!((val1) operator(val2)))                                       \
+      Insert(__FILE__, std::string(#val1) + " " #operator+ " " + #val2, \
+             __LINE__,((val1) operator(val2)));                         \
   }
 
 #define EXPECT_EQ(val1, val2) EXPECT_OP(val1, val2, ==)

@@ -167,7 +167,7 @@ SIMPLE_TEST(Lex, Operators) {
     EXPECT_EQ(TokenType::kTokenValueInt, tokens[2].tok_type);
     EXPECT_EQ(TokenType::kTokenOpEq, tokens[3].tok_type);
     EXPECT_EQ(TokenType::kTokenValueInt, tokens[4].tok_type);
-    EXPECT_EQ(TokenType::kTokenEOI, tokens[7].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
   }
 }
 
@@ -193,6 +193,47 @@ SIMPLE_TEST(Lex, UnknownTokens) {
     EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
     EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
     EXPECT_EQ(TokenType::kTokenUnknown, tokens[3].tok_type);
+  }
+}
+
+SIMPLE_TEST(Lex, Comments) {
+  {
+    std::stringstream ss;
+    ss << "// it's a single line comment.\n" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(1, tokens.size());
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[0].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "// it's a single line comment.\n double b;" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(4, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtDouble, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[3].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "/* multiline \n comments */" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(1, tokens.size());
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[0].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "/* multiline \n comments */ double a;" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(4, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtDouble, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[3].tok_type);
   }
 }
 }  // namespace lex

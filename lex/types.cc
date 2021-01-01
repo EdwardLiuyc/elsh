@@ -22,6 +22,7 @@
 
 #include "lex/types.h"
 
+#include <iomanip>
 #include <map>
 #include <unordered_map>
 
@@ -111,6 +112,26 @@ const std::unordered_map<std::string, TokenType> kReservedKeywords{
     {"void", TokenType::kTokenDtVoid},
     {"bool", TokenType::kTokenDtBool},
     {"string", TokenType::kTokenDtString}};
+
+std::ostream& operator<<(std::ostream& os, const Token& token) {
+  os << std::setw(6) << token.err_ln << ": " << std::setw(3) << token.err_col
+     << std::setw(25) << kTokenNames.at(token.tok_type);
+  switch (token.tok_type) {
+    case TokenType::kTokenValueInt:
+      os << std::setw(12) << token.value_int;
+      break;
+    case TokenType::kTokenValueChar:
+      os << std::setw(12) << static_cast<int>(token.value_char);
+      break;
+    case TokenType::kTokenIdentifier:
+    case TokenType::kTokenValueString:
+      os << std::setw(12) << token.str;
+      break;
+    default:
+      break;
+  }
+  return os;
+}
 
 }  // namespace lex
 }  // namespace elsh

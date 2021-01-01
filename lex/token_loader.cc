@@ -36,6 +36,9 @@ const std::unordered_map<char, TokenType> kSimpleTokenMap{
     {';', TokenType::kTokenSymSemiColon}, {',', TokenType::kTokenSymComma}};
 }
 
+TokenLoader::TokenLoader(std::basic_istream<char>* const stream)
+    : stream_(stream) {}
+
 Token TokenLoader::GetToken() {
   while (isspace(current_char_)) {
     GetNextChar();
@@ -115,26 +118,38 @@ void TokenLoader::GetNextChar() {
 }
 
 Token TokenLoader::DivisionOrComment(const int line, const int col) {
-  if (current_char_ != '*') {
+  if (current_char_ == '*') {
+    // multi line comments
+    GetNextChar();
+    for (;;) {
+      if (current_char_ == '*') {
+        GetNextChar();
+        if (current_char_ == '/') {
+          GetNextChar();
+          // We heve skiped all comments.
+          return GetToken();
+        }
+      } else if (current_char_ == EOF) {
+        return Token(TokenType::kTokenUnknown, line, col, "EOF in comment");
+      } else {
+        GetNextChar();
+      }
+    }
+  } else if (current_char_ == '/') {
+    // single line comments
+    do {
+      GetNextChar();
+    } while (current_char_ != '\n' && current_char_ != EOF);
+
+    if (current_char_ != EOF) {
+      GetNextChar();
+    }
+    return GetToken();
+  } else {
     return Token{TokenType::kTokenOpDiv, line, col, {0}};
   }
 
-  /* comment found */
-  GetNextChar();
-  for (;;) {
-    if (current_char_ == '*') {
-      GetNextChar();
-      if (current_char_ == '/') {
-        GetNextChar();
-        // We heve skiped all comments.
-        return GetToken();
-      }
-    } else if (current_char_ == EOF) {
-      return Token(TokenType::kTokenUnknown, line, col, "EOF in comment");
-    } else {
-      GetNextChar();
-    }
-  }
+  return Token(TokenType::kTokenUnknown, line, col, "unexpected line.");
 }
 
 Token TokenLoader::CharSplit(const int line, const int col) {
@@ -246,12 +261,6 @@ Token TokenLoader::Follow(const char expect, const TokenType is_yes_token,
                  "following unrecognized character: " + current_char_);
   }
   return Token{is_no_token, line, col, {0}};
-}
-
-void TokenLoader::Error(const std::string& error_msg) {
-  std::cerr << current_line_ << ", " << current_col_ << " error: " << error_msg
-            << std::endl;
-  exit(1);
 }
 
 }  // namespace lex

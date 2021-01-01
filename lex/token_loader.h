@@ -34,16 +34,17 @@ namespace lex {
 
 class TokenLoader {
  public:
-  explicit TokenLoader(std::basic_istream<char>* const stream)
-      : stream_(stream) {}
+  explicit TokenLoader(std::basic_istream<char>* const stream);
 
+  /// @brief Get next token.
   Token GetToken();
-
+  /// @brief Get all available tokens. End with `EOI` or unknown token.
   std::vector<Token> GetAllTokens();
 
  private:
   void GetNextChar();
-
+  /// @brief Current we have the charater "/" and need to decide whether it's a
+  /// division operator or a start of comments.
   Token DivisionOrComment(const int line, const int col);
   Token CharSplit(const int line, const int col);
   Token StringSplit(const int line, const int col);
@@ -51,8 +52,6 @@ class TokenLoader {
   TokenType GetIdentifierType(const std::string& text);
   Token Follow(const char next, const TokenType is_yes_token,
                const TokenType is_no_token, const int line, const int col);
-
-  void Error(const std::string& error_msg);
 
  private:
   std::basic_istream<char>* const stream_;

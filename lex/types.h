@@ -23,6 +23,7 @@
 #ifndef LEX_TYPES_H_
 #define LEX_TYPES_H_
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -32,7 +33,8 @@ namespace elsh {
 namespace lex {
 
 enum class TokenType : uint16_t {
-  kTokenEOI = 0,
+  kTokenUnknown = 0,
+  kTokenEOI = 1,
 
   // Operators
   kTokenOpMul = 100,
@@ -90,7 +92,7 @@ enum class TokenType : uint16_t {
   kTokenIdentifier = 500,
   kTokenValueInt = 501,
   kTokenValueDouble = 502,
-  kTokenValudChar = 503,
+  kTokenValueChar = 503,
   kTokenValueString = 504,
   kTokenValueBool = 505,
 };
@@ -118,11 +120,17 @@ struct Token {
       : tok_type(type), err_ln(line), err_col(col), value_int(int_value) {}
   Token(TokenType type, const int line, const int col, const char char_value)
       : tok_type(type), err_ln(line), err_col(col), value_char(char_value) {}
+  Token(TokenType type, const int line, const int col,
+        const double double_value)
+      : tok_type(type),
+        err_ln(line),
+        err_col(col),
+        value_double(double_value) {}
 
-  TokenType tok_type;
+  TokenType tok_type = TokenType::kTokenUnknown;
 
-  int err_ln;
-  int err_col;
+  int err_ln = -1;
+  int err_col = -1;
   std::string str = "";
   // value for constants
   union {
@@ -131,7 +139,11 @@ struct Token {
     char value_char;
     bool value_bool;
   };
+
+  friend std::ostream& operator<<(std::ostream& os, const Token& t);
 };
+
+std::ostream& operator<<(std::ostream& os, const Token& t);
 
 }  // namespace lex
 }  // namespace elsh

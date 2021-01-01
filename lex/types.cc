@@ -22,6 +22,7 @@
 
 #include "lex/types.h"
 
+#include <iomanip>
 #include <map>
 #include <unordered_map>
 
@@ -30,6 +31,8 @@ namespace lex {
 
 const std::unordered_map<TokenType, std::string, EnumClassHash> kTokenNames{
     {TokenType::kTokenEOI, "End_of_input"},
+    {TokenType::kTokenUnknown, "Unknown_token"},
+    // Operators
     {TokenType::kTokenOpMul, "Op_multiply"},
     {TokenType::kTokenOpDiv, "Op_divide"},
     {TokenType::kTokenOpMod, "Op_mod"},
@@ -81,7 +84,7 @@ const std::unordered_map<TokenType, std::string, EnumClassHash> kTokenNames{
     {TokenType::kTokenIdentifier, "Identifier"},
     {TokenType::kTokenValueInt, "Value_int"},
     {TokenType::kTokenValueDouble, "Value_double"},
-    {TokenType::kTokenValudChar, "Value_char"},
+    {TokenType::kTokenValueChar, "Value_char"},
     {TokenType::kTokenValueString, "Value_string"},
     {TokenType::kTokenValueBool, "Value_bool"}};
 
@@ -109,6 +112,26 @@ const std::unordered_map<std::string, TokenType> kReservedKeywords{
     {"void", TokenType::kTokenDtVoid},
     {"bool", TokenType::kTokenDtBool},
     {"string", TokenType::kTokenDtString}};
+
+std::ostream& operator<<(std::ostream& os, const Token& token) {
+  os << std::setw(6) << token.err_ln << ": " << std::setw(3) << token.err_col
+     << std::setw(25) << kTokenNames.at(token.tok_type);
+  switch (token.tok_type) {
+    case TokenType::kTokenValueInt:
+      os << std::setw(12) << token.value_int;
+      break;
+    case TokenType::kTokenValueChar:
+      os << std::setw(12) << static_cast<int>(token.value_char);
+      break;
+    case TokenType::kTokenIdentifier:
+    case TokenType::kTokenValueString:
+      os << std::setw(12) << token.str;
+      break;
+    default:
+      break;
+  }
+  return os;
+}
 
 }  // namespace lex
 }  // namespace elsh

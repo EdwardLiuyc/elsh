@@ -22,11 +22,16 @@
 
 #include "test/utest_framework/simple_unit_test.h"
 
+#include <algorithm>
 #include <iostream>
 
 namespace elsh {
 namespace test {
 namespace utest_framework {
+namespace {
+constexpr int kMaxOutputLength = 40;
+constexpr int kMinDotNum = 4;
+}  // namespace
 
 TestFactory* TestFactory::Instance() {
   static TestFactory instance;
@@ -39,7 +44,18 @@ void TestFactory::Append(std::shared_ptr<TestBase> test_case) {
 
 void TestFactory::Run() {
   for (auto test_case : tests_) {
+    std::string str = "[Test Case] " + test_case->name_ + " ";
+    int dot_num =
+        std::max(kMaxOutputLength - static_cast<int>(test_case->name_.size()),
+                 kMinDotNum);
+    for (int i = 0; i < dot_num; ++i) {
+      str += ".";
+    }
+
     test_case->TestFunc();
+    str += test_case->test_infos_.empty() ? "\e[1;32m passed \e[0m"
+                                          : "\e[1;31m failed \e[0m";
+    std::cout << str << std::endl;
   }
 }
 

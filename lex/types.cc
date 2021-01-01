@@ -30,6 +30,8 @@ namespace lex {
 
 const std::unordered_map<TokenType, std::string, EnumClassHash> kTokenNames{
     {TokenType::kTokenEOI, "End_of_input"},
+    {TokenType::kTokenUnknown, "Unknown_token"},
+    // Operators
     {TokenType::kTokenOpMul, "Op_multiply"},
     {TokenType::kTokenOpDiv, "Op_divide"},
     {TokenType::kTokenOpMod, "Op_mod"},
@@ -81,7 +83,7 @@ const std::unordered_map<TokenType, std::string, EnumClassHash> kTokenNames{
     {TokenType::kTokenIdentifier, "Identifier"},
     {TokenType::kTokenValueInt, "Value_int"},
     {TokenType::kTokenValueDouble, "Value_double"},
-    {TokenType::kTokenValudChar, "Value_char"},
+    {TokenType::kTokenValueChar, "Value_char"},
     {TokenType::kTokenValueString, "Value_string"},
     {TokenType::kTokenValueBool, "Value_bool"}};
 

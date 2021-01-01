@@ -83,14 +83,27 @@ Token TokenLoader::GetToken() {
       case EOF:
         return Token{TokenType::kTokenEOI, start_line, start_col, {0}};
       default:
-        return IndentifierOrInteger(start_line, start_col);
+        return IndentifierOrValue(start_line, start_col);
     }
   }
 }
 
+std::vector<Token> TokenLoader::GetAllTokens() {
+  std::vector<Token> all_tokens;
+  do {
+    all_tokens.push_back(GetToken());
+
+    if (all_tokens.back().tok_type == TokenType::kTokenUnknown) {
+      break;
+    }
+  } while (all_tokens.back().tok_type != TokenType::kTokenEOI);
+
+  return all_tokens;
+}
+
 void TokenLoader::GetNextChar() {
   last_char_ = current_char_;
-  if (source_fs_.get(current_char_)) {
+  if (stream_->get(current_char_)) {
     ++current_col_;
     if (current_char_ == '\n') {
       ++current_line_;
@@ -117,7 +130,7 @@ Token TokenLoader::DivisionOrComment(const int line, const int col) {
         return GetToken();
       }
     } else if (current_char_ == EOF) {
-      Error("EOF in comment");
+      return Token(TokenType::kTokenUnknown, line, col, "EOF in comment");
     } else {
       GetNextChar();
     }
@@ -126,7 +139,8 @@ Token TokenLoader::DivisionOrComment(const int line, const int col) {
 
 Token TokenLoader::CharSplit(const int line, const int col) {
   if (current_char_ == '\'') {
-    Error("empty character constant");
+    return Token(TokenType::kTokenUnknown, line, col,
+                 "empty character constant");
   }
 
   char n = current_char_;
@@ -137,16 +151,18 @@ Token TokenLoader::CharSplit(const int line, const int col) {
     } else if (current_char_ == '\\') {
       n = '\\';
     } else {
-      Error("gettok: unknown escape sequence \\" + current_char_);
+      return Token(TokenType::kTokenUnknown, line, col,
+                   "gettok: unknown escape sequence \\" + current_char_);
     }
   }
 
   GetNextChar();
   if (current_char_ != '\'') {
-    Error("multi-character constant");
+    return Token(TokenType::kTokenUnknown, line, col,
+                 "multi-character constant");
   }
   GetNextChar();
-  return Token{TokenType::kTokenValudChar, line, col, {n}};
+  return Token{TokenType::kTokenValueChar, line, col, {n}};
 }
 
 Token TokenLoader::StringSplit(const int line, const int col) {
@@ -156,9 +172,12 @@ Token TokenLoader::StringSplit(const int line, const int col) {
     if (current_char_ == '"') {
       break;
     }
-    if (current_char_ == '\n') Error("EOL in string");
-    if (current_char_ == EOF) Error("EOF in string");
-
+    if (current_char_ == '\n') {
+      GetNextChar();
+      return Token(TokenType::kTokenUnknown, line, col, "EOL in string");
+    } else if (current_char_ == EOF) {
+      return Token(TokenType::kTokenUnknown, line, col, "EOF in string");
+    }
     str += current_char_;
   }
 
@@ -166,9 +185,9 @@ Token TokenLoader::StringSplit(const int line, const int col) {
   return Token(TokenType::kTokenValueString, line, col, str);
 }
 
-Token TokenLoader::IndentifierOrInteger(const int line, const int col) {
-  int n;
+Token TokenLoader::IndentifierOrValue(const int line, const int col) {
   bool is_number = true;
+  int count_of_point = 0;
 
   std::string str;
   // Digits, UpperCase nums, LowerCase nums, '_', '.' are acceptable.
@@ -177,20 +196,36 @@ Token TokenLoader::IndentifierOrInteger(const int line, const int col) {
     str += current_char_;
     if (isalpha(current_char_) || current_char_ == '_') {
       is_number = false;
+    } else if (current_char_ == '.') {
+      count_of_point++;
     }
     GetNextChar();
   }
   if (str.empty()) {
-    Error("gettok: unrecognized character  " + current_char_);
+    return Token(TokenType::kTokenUnknown, line, col,
+                 "unpupported starting charactor" + current_char_);
   }
 
   if (isdigit(str[0])) {
     if (!is_number) {
-      Error("invalid number: " + str);
+      return Token(TokenType::kTokenUnknown, line, col,
+                   "unpupported starting charactor" + current_char_);
     }
-    n = std::stoi(str);
-    if (errno == ERANGE) Error("Number exceeds maximum value");
-    return Token{TokenType::kTokenValueInt, line, col, {n}};
+    if (count_of_point == 0) {
+      const int integer_value = std::stoi(str);
+      // TODO(edward) if out of range, catch the ex.
+      if (errno == ERANGE) {
+        return Token(TokenType::kTokenUnknown, line, col,
+                     "Number exceeds maximum value: " + str);
+      }
+      return Token{TokenType::kTokenValueInt, line, col, {integer_value}};
+    } else if (count_of_point == 1) {
+      const double double_value = std::stod(str);
+      return Token{TokenType::kTokenValueDouble, line, col, double_value};
+    } else {
+      return Token(TokenType::kTokenUnknown, line, col,
+                   "invalid double: " + str);
+    }
   }
   return Token(GetIdentifierType(str), line, col, str);
 }
@@ -207,7 +242,8 @@ Token TokenLoader::Follow(const char expect, const TokenType is_yes_token,
     GetNextChar();
     return Token{is_yes_token, line, col, {0}};
   } else if (is_no_token == TokenType::kTokenEOI) {
-    Error("Follow: unrecognized character " + current_char_);
+    return Token(TokenType::kTokenUnknown, line, col,
+                 "following unrecognized character: " + current_char_);
   }
   return Token{is_no_token, line, col, {0}};
 }

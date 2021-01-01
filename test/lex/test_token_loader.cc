@@ -21,18 +21,179 @@
 // SOFTWARE.
 
 #include <iostream>
+#include <sstream>
 
 #include "lex/token_loader.h"
 #include "test/utest_framework/simple_unit_test.h"
 
-SIMPLE_TEST(Lex, test1) {
-  EXPECT_EQ(2, 1);
-  EXPECT_GT(2, 1);
-  EXPECT_EQ(2, 2);
+namespace elsh {
+namespace lex {
+
+SIMPLE_TEST(Lex, EmptyStream) {
+  std::stringstream ss;
+  TokenLoader loader(&ss);
+  const auto tokens = loader.GetAllTokens();
+  EXPECT_EQ(1, tokens.size());
+  EXPECT_EQ(TokenType::kTokenEOI, tokens[0].tok_type);
 }
 
-SIMPLE_TEST(Lex, test2) {
-  EXPECT_EQ(1, 1);
-  EXPECT_GE(2, 1);
-  EXPECT_NE(2, 3);
+SIMPLE_TEST(Lex, TypeAndValueTest) {
+  {
+    std::stringstream ss;
+    ss << "int a = 5;\n";
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtInt32, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueInt, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "int64 a = 5;\n";
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtInt64, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueInt, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "char a = 'a';\n";
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtChar, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueChar, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "bool a = true;\n";
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtBool, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueBool, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "string a = \"\";\n";
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtString, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueString, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "double a = 1.2;\n";
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtDouble, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueDouble, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenSymSemiColon, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[5].tok_type);
+  }
 }
+
+SIMPLE_TEST(Lex, Operators) {
+  {
+    std::stringstream ss;
+    ss << "a<b" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(4, tokens.size());
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpLss, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[3].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "a>=b" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(4, tokens.size());
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpGeq, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[3].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "a||b&&a||c" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(8, tokens.size());
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpOr, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAnd, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpOr, tokens[5].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[6].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[7].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "a%1==0" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(6, tokens.size());
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpMod, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueInt, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpEq, tokens[3].tok_type);
+    EXPECT_EQ(TokenType::kTokenValueInt, tokens[4].tok_type);
+    EXPECT_EQ(TokenType::kTokenEOI, tokens[7].tok_type);
+  }
+}
+
+SIMPLE_TEST(Lex, UnknownTokens) {
+  {
+    std::stringstream ss;
+    ss << "char a = '';" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(4, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtChar, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenUnknown, tokens[3].tok_type);
+  }
+  {
+    std::stringstream ss;
+    ss << "double a = 1.2.3;" << std::endl;
+    TokenLoader loader(&ss);
+    const auto tokens = loader.GetAllTokens();
+    EXPECT_EQ(4, tokens.size());
+    EXPECT_EQ(TokenType::kTokenDtDouble, tokens[0].tok_type);
+    EXPECT_EQ(TokenType::kTokenIdentifier, tokens[1].tok_type);
+    EXPECT_EQ(TokenType::kTokenOpAssign, tokens[2].tok_type);
+    EXPECT_EQ(TokenType::kTokenUnknown, tokens[3].tok_type);
+  }
+}
+}  // namespace lex
+}  // namespace elsh

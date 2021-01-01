@@ -35,10 +35,9 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  elsh::lex::TokenLoader loader(argv[1]);
-  Token tok;
-  do {
-    tok = loader.GetToken();
+  std::ifstream fs(argv[1]);
+  elsh::lex::TokenLoader loader(&fs);
+  for (const auto& tok : loader.GetAllTokens()) {
     std::cout << "\t" << tok.err_ln << "\t" << tok.err_col << "\t"
               << kTokenNames.at(tok.tok_type);
 
@@ -46,7 +45,7 @@ int main(int argc, char** argv) {
       case TokenType::kTokenValueInt:
         std::cout << "\t" << tok.value_int;
         break;
-      case TokenType::kTokenValudChar:
+      case TokenType::kTokenValueChar:
         std::cout << "\t" << static_cast<int>(tok.value_char);
         break;
       case TokenType::kTokenIdentifier:
@@ -58,7 +57,7 @@ int main(int argc, char** argv) {
         break;
     }
     std::cout << "\n" << std::flush;
-  } while (tok.tok_type != TokenType::kTokenEOI);
+  }
 
   return 0;
 }

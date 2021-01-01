@@ -39,7 +39,14 @@ void TestFactory::Append(std::shared_ptr<TestBase> test_case) {
 
 void TestFactory::Run() {
   for (auto test_case : tests_) {
+    std::cout << "Running test: " << test_case->name_;
     test_case->TestFunc();
+    if (test_case->test_infos_.empty()) {
+      std::cout << "  .... passed";
+    } else {
+      std::cout << "  .... failed";
+    }
+    std::cout << std::endl;
   }
 }
 

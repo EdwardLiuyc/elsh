@@ -54,9 +54,9 @@ $(BUILD_DIR)/$(TEST_FM_DIR)/%.o: $(TEST_FM_DIR)/%.cc $(TEST_FM_DIR)/%.h
 
 ## test lex
 test_lex: $(TEST_LEX_BINS)
-$(BUILD_DIR)/$(TEST_LEX_DIR)/%: $(TEST_LEX_DIR)/%.cc $(TEST_FM_A) 
+$(BUILD_DIR)/$(TEST_LEX_DIR)/%: $(TEST_LEX_DIR)/%.cc $(TEST_FM_A) $(LEX_A)
 		@mkdir -p $(BUILD_DIR)/$(TEST_LEX_DIR)
-		$(CC) $< -I. -o $@ $(CCFLAGS) $(LDFLAGS) -l$(TEST_FM_LIB_NAME)
+		$(CC) $< -I. -o $@ $(CCFLAGS) $(LDFLAGS) -l$(TEST_FM_LIB_NAME) -l$(LEX_LIB_NAME)
 
 echo:
 		@echo "CC = $(CC)"

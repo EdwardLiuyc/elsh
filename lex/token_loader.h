@@ -23,8 +23,9 @@
 #ifndef LEX_TOKEN_LOADER_H_
 #define LEX_TOKEN_LOADER_H_
 
-#include <fstream>
+#include <iostream>
 #include <string>
+#include <vector>
 
 #include "lex/types.h"
 
@@ -33,10 +34,12 @@ namespace lex {
 
 class TokenLoader {
  public:
-  explicit TokenLoader(const std::string& source_filename)
-      : source_fs_(source_filename) {}
+  explicit TokenLoader(std::basic_istream<char>* const stream)
+      : stream_(stream) {}
 
   Token GetToken();
+
+  std::vector<Token> GetAllTokens();
 
  private:
   void GetNextChar();
@@ -44,7 +47,7 @@ class TokenLoader {
   Token DivisionOrComment(const int line, const int col);
   Token CharSplit(const int line, const int col);
   Token StringSplit(const int line, const int col);
-  Token IndentifierOrInteger(const int line, const int col);
+  Token IndentifierOrValue(const int line, const int col);
   TokenType GetIdentifierType(const std::string& text);
   Token Follow(const char next, const TokenType is_yes_token,
                const TokenType is_no_token, const int line, const int col);
@@ -52,7 +55,7 @@ class TokenLoader {
   void Error(const std::string& error_msg);
 
  private:
-  std::ifstream source_fs_;
+  std::basic_istream<char>* const stream_;
   char current_char_ = ' ';
   char last_char_;
 

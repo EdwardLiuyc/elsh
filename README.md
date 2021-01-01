@@ -1,4 +1,4 @@
-# elsh
+<img src="doc/elsh_logo.png" />
 
 ## Motivation 
 In a word, I want to build my own script language that can be written in `C` or a simplied version of `C`. And here are some basic rules: 
